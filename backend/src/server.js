@@ -1,49 +1,58 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import authRoutes from './routes/authRoutes.js';
+import rideRoutes from './routes/rideRoutes.js';
+import driverRoutes from './routes/driverRoutes.js';
+import demoRoutes from './routes/demoRoutes.js';
 
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 
-// CORS সেটআপ - সব অরিজিন এলাউ করা হয়েছে
+// Enable CORS for frontend
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json());
 
-// Test Health Route
+// Root & Health check
+app.get('/', (req, res) => {
+  res.json({
+    app: 'Dhaka Tesla Pool API',
+    tagline: 'Share a seat. Split the fare. Survive Dhaka traffic.',
+    status: 'ONLINE',
+    version: '1.0.0',
+    story: '8:41 AM, Banani Road 11 - Jashim, Bullet, Nusrat, Rafiq, Shirin',
+  });
+});
+
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', time: new Date() });
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Users List Route
-app.get('/api/users', async (req, res) => {
-  try {
-    const users = await prisma.user.findMany({
-      include: { tesla: true },
-    });
+// Mount modular API routers
+app.use('/api', authRoutes);
+app.use('/api/rides', rideRoutes);
+app.use('/api/driver', driverRoutes);
+app.use('/api/demo', demoRoutes);
 
-    // BigInt serialization handle
-    const serializedUsers = JSON.parse(
-      JSON.stringify(users, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-      )
-    );
-
-    res.json(serializedUsers);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled Server Error:', err);
+  res.status(500).json({
+    error: err.message || 'Internal Server Error',
+  });
 });
 
-// Explicitly listen on 0.0.0.0 to fix IPv6/IPv4 binding issues
+// Explicitly bind to 0.0.0.0 for cross-environment compatibility
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`⚡ Driver & Passenger API running at http://localhost:${PORT}`);
+  console.log(`⚡ Dhaka Tesla Pool API running at http://0.0.0.0:${PORT}`);
+  console.log(`🚗 Story cast ready: Driver Jashim (Bullet, 3 seats) and Passengers Nusrat, Rafiq, Shirin`);
 });
+
+export default app;
