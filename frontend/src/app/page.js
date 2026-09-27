@@ -1,67 +1,131 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { api } from '../lib/api';
+import CastSelector from '../components/CastSelector';
+import StoryWalkthrough from '../components/StoryWalkthrough';
+import PassengerView from '../components/PassengerView';
+import DriverView from '../components/DriverView';
+import AuditLogModal from '../components/AuditLogModal';
 
 export default function Home() {
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAuditOpen, setIsAuditOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await api.getUsers();
+      setUsers(data);
+      if (!selectedUser && data.length > 0) {
+        // Default to Nusrat (1st passenger from story)
+        const nusrat = data.find((u) => u.name === 'Nusrat') || data[0];
+        setSelectedUser(nusrat);
+      } else if (selectedUser) {
+        // Sync selected user data
+        const updated = data.find((u) => u.id === selectedUser.id);
+        if (updated) setSelectedUser(updated);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to connect to Dhaka Tesla Pool backend');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Port 4000 পরিবর্তন করে backend .env এর PORT 5000 বসানো হয়েছে
-    fetch('http://127.0.0.1:5000/api/users')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch users from server');
-        return res.json();
-      })
-      .then((data) => {
-        setUsers(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('API Error:', err);
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+    loadUsers();
+  }, [refreshKey]);
+
+  const handleResetDemo = async () => {
+    if (!confirm('Reset the entire system to 8:41 AM Banani initial state?')) return;
+    try {
+      setIsResetting(true);
+      await api.resetDemo();
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      alert(`Reset failed: ${err.message}`);
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  const handleActionCompleted = () => {
+    setRefreshKey((k) => k + 1);
+  };
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white p-8">
-      <h1 className="text-3xl font-bold mb-2">⚡ Dhaka Tesla Pool</h1>
-      <p className="text-slate-400 mb-8">Share a seat. Split the fare. Survive Dhaka traffic.</p>
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      {/* Top Header & Actor Switcher */}
+      <CastSelector
+        users={users}
+        selectedUser={selectedUser}
+        onSelectUser={(u) => setSelectedUser(u)}
+        onOpenAudit={() => setIsAuditOpen(true)}
+        onResetDemo={handleResetDemo}
+        isResetting={isResetting}
+      />
 
-      {loading ? (
-        <p className="text-amber-400 animate-pulse">Connecting to backend API...</p>
-      ) : error ? (
-        <div className="p-4 bg-red-900/40 border border-red-500/50 rounded-lg text-red-300 max-w-md">
-          <p className="font-semibold">Backend Connection Failed!</p>
-          <p className="text-sm mt-1">{error}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl">
-          {users.map((user) => (
-            <div key={user.id} className="p-4 bg-slate-800 rounded-lg border border-slate-700">
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-xl font-semibold">{user.name}</h2>
-                <span
-                  className={`px-2 py-1 text-xs rounded font-medium ${
-                    user.role === 'DRIVER' ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'
-                  }`}
-                >
-                  {user.role}
-                </span>
-              </div>
-              <p className="text-sm text-slate-400">{user.email}</p>
-              {user.tesla && (
-                <div className="mt-3 pt-3 border-t border-slate-700 text-xs text-slate-300">
-                  <p>Vehicle: <strong>{user.tesla.modelName}</strong></p>
-                  <p>Capacity: {user.tesla.capacity} seats</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </main>
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
+        {/* Story Interactive Walkthrough Banner */}
+        <StoryWalkthrough onActionCompleted={handleActionCompleted} />
+
+        {loading && !selectedUser ? (
+          <div className="p-16 text-center text-slate-400">
+            <div className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="font-semibold text-lg text-white">Connecting to Bullet & Dhaka Tesla Nodes...</p>
+            <p className="text-xs text-slate-500 mt-1">Starting up backend API on port 5000</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 bg-red-950/40 border border-red-500/50 rounded-2xl max-w-lg mx-auto text-center">
+            <span className="text-4xl block mb-2">⚠️</span>
+            <h3 className="text-lg font-bold text-red-200">Backend API Offline</h3>
+            <p className="text-xs text-red-300 mt-2">{error}</p>
+            <button
+              onClick={() => setRefreshKey((k) => k + 1)}
+              className="mt-4 px-4 py-2 bg-red-800 hover:bg-red-700 text-white rounded-xl text-xs font-semibold"
+            >
+              Retry Connection
+            </button>
+          </div>
+        ) : selectedUser ? (
+          <div>
+            {selectedUser.role === 'DRIVER' ? (
+              <DriverView
+                key={`${selectedUser.id}-${refreshKey}`}
+                user={selectedUser}
+                onActionCompleted={handleActionCompleted}
+              />
+            ) : (
+              <PassengerView
+                key={`${selectedUser.id}-${refreshKey}`}
+                user={selectedUser}
+                onActionCompleted={handleActionCompleted}
+              />
+            )}
+          </div>
+        ) : null}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
+        <p>
+          Dhaka Tesla Pool MVP • Banani Road 11 Rush Hour • Bullet Capacity: 3 Seats
+        </p>
+      </footer>
+
+      {/* Audit Log Modal */}
+      <AuditLogModal
+        isOpen={isAuditOpen}
+        onClose={() => setIsAuditOpen(false)}
+      />
+    </div>
   );
 }
