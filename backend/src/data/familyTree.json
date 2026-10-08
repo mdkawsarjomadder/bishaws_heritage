@@ -1,0 +1,409 @@
+{
+  "grandparents": {
+    "nana": {
+      "id": "gen1-nana",
+      "nameEn": "Abdul Wahab Bishaws",
+      "nameBn": "আব্দুল ওহাব বিশ্বাস",
+      "role": "নানা (Grandfather / মূল ভিত্তি)",
+      "generation": 1,
+      "gender": "male",
+      "avatar": "👴",
+      "avatarImg": "/nana-avatar.png",
+      "color": "amber",
+      "bio": "বিশ্বাস পরিবারের মূল কাণ্ডারী ও শ্রদ্ধেয় নানা।"
+    },
+    "nanu": {
+      "id": "gen1-nanu",
+      "nameEn": "Ferejha Begum",
+      "nameBn": "ফেরেজা বেগম",
+      "role": "নানু (Grandmother / মাতামহী)",
+      "generation": 1,
+      "gender": "female",
+      "avatar": "🧕",
+      "color": "amber",
+      "bio": "সবার স্নেহময়ী ও পরম শ্রদ্ধেয়া নানু।",
+      "avatarImg": "/nanu-avatar.png"
+    }
+  },
+  "branches": [
+    {
+      "id": "branch-1",
+      "parentNameEn": "Nilufa Begum",
+      "parentNameBn": "নিলুফা বেগম",
+      "role": "বড় মেয়ে (১ম কন্যা)",
+      "generation": 2,
+      "gender": "female",
+      "avatar": "🧕",
+      "color": "emerald",
+      "phone": "+8801700-111111",
+      "location": "ঢাকা / বরিশাল",
+      "childrenCount": 5,
+      "children": [
+        {
+          "id": "b1-c1",
+          "nameEn": "Razia Begum",
+          "nameBn": "রাজিয়া বেগম",
+          "gender": "female",
+          "relation": "ভাগ্নি / খালাতো বোন",
+          "generation": 3,
+          "avatar": "🧕",
+          "phone": "+8801700-111112",
+          "occupation": "গৃহিণী / চাকুরিজীবী",
+          "avatarImg": "/female-avatar.png"
+        },
+        {
+          "id": "b1-c2",
+          "nameEn": "Mamun",
+          "nameBn": "মামুন",
+          "gender": "male",
+          "relation": "ভাগ্নে / খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/mamun-profile.png",
+          "phone": "+8801700-111113",
+          "occupation": "ব্যবসা / পেশাজীবী"
+        },
+        {
+          "id": "b1-c3",
+          "nameEn": "Masum",
+          "nameBn": "মাসুম",
+          "gender": "male",
+          "relation": "ভাগ্নে / খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/masum-profile.png",
+          "phone": "+8801700-111114",
+          "occupation": "পেশাজীবী"
+        },
+        {
+          "id": "b1-c4",
+          "nameEn": "Maphiya",
+          "nameBn": "মাফিয়া",
+          "gender": "female",
+          "relation": "ভাগ্নি / খালাতো বোন",
+          "generation": 3,
+          "avatar": "🧕",
+          "phone": "+8801700-111115",
+          "occupation": "গৃহিণী",
+          "avatarImg": "/female-avatar.png"
+        },
+        {
+          "id": "b1-c5",
+          "nameEn": "Mafuz",
+          "nameBn": "মাহফুজ",
+          "gender": "male",
+          "relation": "ভাগ্নে / খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/mafuz-profile.png",
+          "phone": "+8801700-111116",
+          "occupation": "শিক্ষার্থী / পেশাজীবী"
+        }
+      ],
+      "avatarImg": "/black-hijab.png"
+    },
+    {
+      "id": "branch-2",
+      "parentNameEn": "Rahima Begum",
+      "parentNameBn": "রাহিমা বেগম",
+      "role": "মেজো মেয়ে (২য় কন্যা - কাওসারের আম্মা)",
+      "generation": 2,
+      "gender": "female",
+      "avatar": "🧕",
+      "color": "indigo",
+      "phone": "+8801700-222222",
+      "location": "ঢাকা, বাংলাদেশ",
+      "childrenCount": 4,
+      "children": [
+        {
+          "id": "b2-c1",
+          "nameEn": "Ruhul Kuddus",
+          "nameBn": "রুহুল কুদ্দুস",
+          "gender": "male",
+          "relation": "বড় ভাই",
+          "generation": 3,
+          "avatar": "👨‍💼",
+          "avatarImg": "/kuddus-profile.jpg",
+          "phone": "+8801700-222223",
+          "occupation": "চাকুরীজীবী",
+          "location": "????, ????????",
+          "bio": "?????????? ???????? ? ??????? ???????? ???????? ????????????? ?????? ???????"
+        },
+        {
+          "id": "b2-c2",
+          "nameEn": "Kaiyum Zomadder",
+          "nameBn": "কাইয়ুম জোমাদ্দার",
+          "gender": "male",
+          "relation": "মেজো ভাই",
+          "generation": 3,
+          "avatar": "👨‍💼",
+          "avatarImg": "/kaiyum-profile.jpg",
+          "phone": "+8801700-222224",
+          "occupation": "ব্যবসা / পেশাজীবী"
+        },
+        {
+          "id": "b2-c3",
+          "nameEn": "Kawsar",
+          "nameBn": "কাওসার",
+          "gender": "male",
+          "relation": "নিজের পরিবার (You)",
+          "generation": 3,
+          "avatar": "👨‍💻",
+          "avatarImg": "/kawsar-profile.jpg",
+          "phone": "+8801700-222225",
+          "occupation": "সফটওয়্যার ডেভেলপার / টেক প্রফেশনাল",
+          "isCurrentUser": true
+        },
+        {
+          "id": "b2-c4",
+          "nameEn": "Nishat",
+          "nameBn": "নিশাত",
+          "gender": "female",
+          "relation": "বোন",
+          "generation": 3,
+          "avatar": "🧕",
+          "phone": "+8801700-222226",
+          "occupation": "শিক্ষার্থী / পেশাজীবী",
+          "avatarImg": "/female-avatar.png"
+        }
+      ],
+      "avatarImg": "/black-hijab.png"
+    },
+    {
+      "id": "branch-3",
+      "parentNameEn": "Shanu Begum",
+      "parentNameBn": "শানু বেগম",
+      "role": "৩য় মেয়ে (৩য় কন্যা)",
+      "generation": 2,
+      "gender": "female",
+      "avatar": "🧕",
+      "color": "rose",
+      "phone": "+8801700-333333",
+      "location": "বাংলাদেশ",
+      "childrenCount": 3,
+      "children": [
+        {
+          "id": "b3-c1",
+          "nameEn": "Suzun",
+          "nameBn": "সুজন",
+          "gender": "male",
+          "relation": "খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/suzun-profile.jpg",
+          "phone": "+8801700-333334",
+          "occupation": "পেশাজীবী"
+        },
+        {
+          "id": "b3-c2",
+          "nameEn": "Shawn",
+          "nameBn": "শাওন",
+          "gender": "male",
+          "relation": "খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/shawn-profile.png",
+          "phone": "+8801700-333335",
+          "occupation": "চাকুরীজীবী"
+        },
+        {
+          "id": "b3-c3",
+          "nameEn": "Jannat",
+          "nameBn": "জান্নাত",
+          "gender": "female",
+          "relation": "খালাতো বোন",
+          "generation": 3,
+          "avatar": "🧕",
+          "phone": "+8801700-333336",
+          "occupation": "শিক্ষার্থী",
+          "avatarImg": "/female-avatar.png"
+        }
+      ],
+      "avatarImg": "/black-hijab.png"
+    },
+    {
+      "id": "branch-4",
+      "parentNameEn": "Blue Begum",
+      "parentNameBn": "ব্লু বেগম (বিলু)",
+      "role": "৪র্থ মেয়ে (৪র্থ কন্যা)",
+      "generation": 2,
+      "gender": "female",
+      "avatar": "🧕",
+      "color": "cyan",
+      "phone": "+8801700-444444",
+      "location": "বাংলাদেশ",
+      "childrenCount": 2,
+      "children": [
+        {
+          "id": "b4-c1",
+          "nameEn": "Hriday",
+          "nameBn": "হৃদয়",
+          "gender": "male",
+          "relation": "খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/hriday-profile.png",
+          "phone": "+8801700-444445",
+          "occupation": "পেশাজীবী"
+        },
+        {
+          "id": "b4-c2",
+          "nameEn": "Readwon",
+          "nameBn": "রেদওয়ান",
+          "gender": "male",
+          "relation": "খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/readwon-profile.png",
+          "phone": "+8801700-444446",
+          "occupation": "শিক্ষার্থী"
+        }
+      ],
+      "avatarImg": "/black-hijab.png"
+    },
+    {
+      "id": "branch-5",
+      "parentNameEn": "Md Abdul Wadud Khokon",
+      "parentNameBn": "মোঃ আব্দুল ওয়াদুদ খোকন",
+      "role": "একমাত্র ছেলে (৫ম সন্তান - মামা)",
+      "generation": 2,
+      "gender": "male",
+      "avatar": "👨‍💼",
+      "avatarImg": "/khokon-profile.jpg",
+      "color": "blue",
+      "phone": "+8801700-555555",
+      "location": "বাংলাদেশ",
+      "childrenCount": 3,
+      "children": [
+        {
+          "id": "b5-c1",
+          "nameEn": "Apu",
+          "nameBn": "অপু",
+          "gender": "male",
+          "relation": "মামাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/apu-profile.jpg",
+          "phone": "+8801700-555556",
+          "occupation": "পেশাজীবী"
+        },
+        {
+          "id": "b5-c2",
+          "nameEn": "Nipu",
+          "nameBn": "নিপু",
+          "gender": "female",
+          "relation": "মামাতো বোন",
+          "generation": 3,
+          "avatar": "🧕",
+          "phone": "+8801700-555557",
+          "occupation": "শিক্ষার্থী",
+          "avatarImg": "/female-avatar.png"
+        },
+        {
+          "id": "b5-c3",
+          "nameEn": "Abdullah",
+          "nameBn": "আব্দুল্লাহ",
+          "gender": "male",
+          "relation": "মামাতো ভাই",
+          "generation": 3,
+          "avatar": "👦",
+          "avatarImg": "/abdullah-profile.jpg",
+          "phone": "+8801700-555558",
+          "occupation": "শিক্ষার্থী"
+        }
+      ]
+    },
+    {
+      "id": "branch-6",
+      "parentNameEn": "Mahmuda Begum",
+      "parentNameBn": "মাহমুদা বেগম",
+      "role": "৫ম মেয়ে (৬ষ্ঠ সন্তান)",
+      "generation": 2,
+      "gender": "female",
+      "avatar": "🧕",
+      "color": "teal",
+      "phone": "+8801700-666666",
+      "location": "বাংলাদেশ",
+      "childrenCount": 3,
+      "children": [
+        {
+          "id": "b6-c1",
+          "nameEn": "Aman",
+          "nameBn": "আমান",
+          "gender": "male",
+          "relation": "খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👨",
+          "avatarImg": "/aman-profile.png",
+          "phone": "+8801700-666667",
+          "occupation": "পেশাজীবী"
+        },
+        {
+          "id": "b6-c2",
+          "nameEn": "Marzan",
+          "nameBn": "মারজান",
+          "gender": "female",
+          "relation": "খালাতো বোন",
+          "generation": 3,
+          "avatar": "🧕",
+          "phone": "+8801700-666668",
+          "occupation": "শিক্ষার্থী",
+          "avatarImg": "/female-avatar.png"
+        },
+        {
+          "id": "b6-c3",
+          "nameEn": "Maria",
+          "nameBn": "মারিয়া",
+          "gender": "female",
+          "relation": "খালাতো বোন",
+          "generation": 3,
+          "avatar": "🧕",
+          "phone": "+8801700-666669",
+          "occupation": "শিক্ষার্থী",
+          "avatarImg": "/female-avatar.png"
+        }
+      ],
+      "avatarImg": "/black-hijab.png"
+    },
+    {
+      "id": "branch-7",
+      "parentNameEn": "Halima Begum",
+      "parentNameBn": "হালিমা বেগম",
+      "role": "ছোট মেয়ে (ছোট খালা)",
+      "generation": 2,
+      "gender": "female",
+      "avatar": "🧕",
+      "color": "purple",
+      "phone": "+8801700-777777",
+      "location": "বাংলাদেশ",
+      "childrenCount": 2,
+      "children": [
+        {
+          "id": "b7-c1",
+          "nameEn": "Aha Moni",
+          "nameBn": "আহা মনি",
+          "gender": "female",
+          "relation": "খালাতো বোন",
+          "generation": 3,
+          "avatar": "🧕",
+          "phone": "+8801700-777778",
+          "occupation": "শিক্ষার্থী",
+          "avatarImg": "/female-avatar.png"
+        },
+        {
+          "id": "b7-c2",
+          "nameEn": "Addi",
+          "nameBn": "আদ্দি",
+          "gender": "male",
+          "relation": "খালাতো ভাই",
+          "generation": 3,
+          "avatar": "👦",
+          "avatarImg": "/addi-profile.png",
+          "phone": "+8801700-777779",
+          "occupation": "শিক্ষার্থী"
+        }
+      ],
+      "avatarImg": "/black-hijab.png"
+    }
+  ]
+}

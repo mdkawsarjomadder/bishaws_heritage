@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartRent Manager - বাসা ভাড়া ও ভাড়াটিয়া ব্যবস্থাপনা</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+    }
+    .badge-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .5; }
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #receiptModalContent, #receiptModalContent * {
+        visibility: visible;
+      }
+      #receiptModalContent {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- TOP HEADER NAVBAR -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo & Branding -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-100">
+            <!-- Home Building Icon -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-bold tracking-tight text-slate-900">SmartRent<span class="text-indigo-600">Manager</span></span>
+              <span class="text-[11px] font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-200/60">PRO v2.4</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-medium">বাসা ভাড়া ও ভাড়াটিয়া ব্যবস্থাপনা সিস্টেম</p>
+          </div>
+        </div>
+
+        <!-- Global Search Bar -->
+        <div class="hidden md:flex flex-1 max-w-md mx-8">
+          <div class="relative w-full">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input 
+              type="text" 
+              id="globalSearchInput" 
+              oninput="handleGlobalSearch(this.value)" 
+              placeholder="Search Flat # (101, 202) or Tenant (Sakib, Tanvir)..." 
+              class="w-full pl-9 pr-12 py-2 text-sm bg-slate-100 hover:bg-slate-100/80 focus:bg-white text-slate-800 placeholder-slate-400 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            >
+            <kbd class="absolute right-2.5 top-2.5 inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 rounded">
+              ⌘K
+            </kbd>
+          </div>
+        </div>
+
+        <!-- Right Side: Quick Alerts & Admin Profile -->
+        <div class="flex items-center gap-3">
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors relative" title="Notifications">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+              </svg>
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white badge-pulse"></span>
+            </button>
+          </div>
+
+          <!-- Currency badge -->
+          <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-lg border border-emerald-200">
+            <span>🇧🇩 BDT (৳)</span>
+          </div>
+
+          <!-- Admin Profile Avatar -->
+          <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-slate-800 to-indigo-900 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-indigo-100">
+              MK
+            </div>
+            <div class="hidden lg:block text-left">
+              <div class="text-xs font-bold text-slate-800 flex items-center gap-1">
+                Kawsar Hossain
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+              <p class="text-[11px] text-slate-500">বাড়িওয়ালা (Property Owner)</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PRIMARY NAVIGATION TABS -->
+    <div class="bg-slate-900 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex items-center gap-1 overflow-x-auto py-1.5 text-sm font-medium scrollbar-none" id="mainNav">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab active flex items-center gap-2 px-3.5 py-2 rounded-lg bg-indigo-600 text-white transition-colors">
+            <span>🏠</span>
+            <span>ড্যাশবোর্ড (Dashboard)</span>
+          </button>
+          <button onclick="switchTab('flats')" id="nav-flats" class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+            <span>🏢</span>
+            <span>ফ্ল্যাট ও রুম (Flats)</span>
+            <span class="text-xs bg-slate-700 text-slate-300 px-1.5 py-0.2 rounded-md font-mono" id="navFlatCount">12</span>
+          </button>
+          <button onclick="switchTab('tenants')" id="nav-tenants" class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+            <span>👥</span>
+            <span>ভাড়াটিয়া তালিকা (Tenants)</span>
+            <span class="text-xs bg-slate-700 text-slate-300 px-1.5 py-0.2 rounded-md font-mono" id="navTenantCount">9</span>
+          </button>
+          <button onclick="switchTab('invoices')" id="nav-invoices" class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+            <span>📄</span>
+            <span>ভাড়ার রসিদ ও বিল (Invoices & Bills)</span>
+            <span class="text-xs bg-rose-500/20 text-rose-300 border border-rose-500/40 px-1.5 py-0.2 rounded-md font-semibold" id="navDueCount">3 Due</span>
+          </button>
+          <button onclick="switchTab('reports')" id="nav-reports" class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+            <span>📊</span>
+            <span>হিসাব ও রিপোর্ট (Reports)</span>
+          </button>
+          <button onclick="switchTab('settings')" id="nav-settings" class="nav-tab flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+            <span>⚙️</span>
+            <span>সেটিংস (Settings)</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- SUB-VIEW 1: DASHBOARD (PRIMARY DEFAULT VIEW) -->
+    <div id="view-dashboard" class="space-y-6">
+
+      <!-- SECTION 1: STAT CARDS (TOP OVERVIEW) -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">সারসংক্ষেপ (Top Overview)</h2>
+          <span class="text-xs text-slate-400 font-medium">চলতি মাস: <strong class="text-slate-700">October 2026</strong></span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Card 1: Total Flats -->
+          <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">মোট ফ্ল্যাট / রুম</span>
+              <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                🏢
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-3xl font-extrabold text-slate-900 tracking-tight" id="statTotalFlats">12</span>
+              <span class="text-xs font-medium text-slate-500">টি ইউনিট</span>
+            </div>
+            <div class="mt-2.5 flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+              <span>+2 added this year (নতুন ফ্ল্যাট যুক্ত)</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Occupied Flats -->
+          <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ভাড়া দেওয়া হয়েছে</span>
+              <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                👥
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-3xl font-extrabold text-emerald-600 tracking-tight" id="statOccupiedFlats">9</span>
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">75% অকুপাইড</span>
+            </div>
+            <div class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span id="statActiveLeases">9 Active leases (সক্রিয় ভাড়াটিয়া)</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Vacant Flats -->
+          <div class="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ফাঁকা ফ্ল্যাট (Vacant)</span>
+              <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                🚪
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+              <span class="text-3xl font-extrabold text-amber-600 tracking-tight" id="statVacantFlats">3</span>
+              <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Available</span>
+            </div>
+            <div class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>Ready to rent (ভাড়া দেওয়ার উপযোগী)</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Total Due Amount -->
+          <div class="bg-white rounded-xl p-5 border border-rose-200 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-16 h-16 bg-rose-50 rounded-bl-full -z-0"></div>
+            <div class="flex items-center justify-between relative z-10">
+              <span class="text-xs font-semibold text-rose-700 uppercase tracking-wider">মোট বকেয়া ভাড়া (Due)</span>
+              <div class="w-9 h-9 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
+                ⚠️
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-1 relative z-10">
+              <span class="text-2xl sm:text-3xl font-extrabold text-rose-600 tracking-tight" id="statTotalDue">42,500</span>
+              <span class="text-xs font-bold text-rose-700">BDT (৳)</span>
+            </div>
+            <div class="mt-2.5 flex items-center gap-1.5 text-xs text-rose-600 font-medium relative z-10">
+              <span class="w-2 h-2 rounded-full bg-rose-500 badge-pulse"></span>
+              <span id="statUnpaidCount">3 Invoices unpaid (জরুরি তাগাদা প্রয়োজন)</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECTION 2: QUICK ACTIONS & FILTERS -->
+      <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1 hidden sm:inline">Quick Actions:</span>
+          
+          <button onclick="openModal('addFlatModal')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-xs hover:shadow transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>+ Add New Flat (নতুন ফ্ল্যাট)</span>
+          </button>
+
+          <button onclick="openModal('assignTenantModal')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs hover:shadow transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            <span>👤 Assign Tenant (ভাড়াটিয়া বরাদ্দ)</span>
+          </button>
+
+          <button onclick="openModal('generateBillModal')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg shadow-xs hover:shadow transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span>🧾 Generate Monthly Bill (মাসিক বিল)</span>
+          </button>
+        </div>
+
+        <!-- Filter Segment -->
+        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg w-full md:w-auto justify-between sm:justify-start">
+          <button onclick="filterFlats('all')" id="filter-all" class="filter-btn active text-xs font-bold px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-xs">
+            সকল (All)
+          </button>
+          <button onclick="filterFlats('occupied')" id="filter-occupied" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">
+            Occupied (৯)
+          </button>
+          <button onclick="filterFlats('vacant')" id="filter-vacant" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">
+            Vacant (৩)
+          </button>
+          <button onclick="filterFlats('due')" id="filter-due" class="filter-btn text-xs font-medium px-3 py-1.5 rounded-md text-rose-600 hover:text-rose-700">
+            ⚠️ Due (৩)
+          </button>
+        </div>
+
+      </div>
+
+      <!-- SECTION 3: FLAT STATUS GRID -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">FLAT STATUS GRID (ফ্ল্যাট স্ট্যাটাস গ্রিড)</h3>
+            <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-mono" id="gridCountDisplay">12 টি ফ্ল্যাট</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-slate-500">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> পরিশোধিত (PAID)</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> বকেয়া (DUE)</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> ফাঁকা (VACANT)</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Grid Container -->
+        <div id="flatsGridContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <!-- Cards injected dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- SECTION 4: RECENT UNPAID INVOICES TABLE (Action Required) -->
+      <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div class="p-4 sm:px-6 border-b border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-rose-50/50 to-white">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500 badge-pulse"></span>
+              <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">RECENT UNPAID INVOICES (জরুরি বকেয়া ভাড়ার তালিকা)</h3>
+              <span class="text-xs bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full border border-rose-200" id="unpaidCountBadge">3 Invoices</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">যেসব ভাড়াটিয়ার চলতি মাসের ভাড়া বাকি রয়েছে — দ্রুত অ্যাকশন গ্রহণ করুন</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="sendBulkReminders()" class="px-3 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg border border-rose-200 transition-colors flex items-center gap-1.5">
+              <span>📲</span>
+              <span>Send SMS Reminder to All</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider border-b border-slate-200 font-semibold">
+              <tr>
+                <th class="py-3 px-4">ফ্ল্যাট নম্বর</th>
+                <th class="py-3 px-4">ভাড়াটিয়ার নাম ও মোবাইল</th>
+                <th class="py-3 px-4">মাসের নাম</th>
+                <th class="py-3 px-4">বিল বিভাজন (Breakdown)</th>
+                <th class="py-3 px-4 text-right">মোট বকেয়া (Amount)</th>
+                <th class="py-3 px-4">সর্বশেষ তারিখ (Due Date)</th>
+                <th class="py-3 px-4 text-center">অ্যাকশন (Action)</th>
+              </tr>
+            </thead>
+            <tbody id="unpaidInvoicesTableBody" class="divide-y divide-slate-100 font-medium">
+              <!-- Injected via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUB-VIEW 2: FLATS VIEW -->
+    <div id="view-flats" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">🏢 Flats & Rooms Directory (ফ্ল্যাট ও রুমের তালিকা)</h2>
+            <p class="text-xs text-slate-500">রুম নম্বর, সাইজ (স্কয়ার ফিট), ফ্লোর, ভাড়া ও বর্তমান স্থিতি</p>
+          </div>
+          <button onclick="openModal('addFlatModal')" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700">
+            + Add New Flat
+          </button>
+        </div>
+        <div id="flatsListView" class="mt-6 space-y-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-VIEW 3: TENANTS VIEW -->
+    <div id="view-tenants" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">👥 Tenant Profiles (ভাড়াটিয়াদের তথ্য ও প্রোফাইল)</h2>
+            <p class="text-xs text-slate-500">নাম, জাতীয় পরিচয়পত্র (NID), মোবাইল ও ভাড়ার বিস্তারিত</p>
+          </div>
+          <button onclick="openModal('assignTenantModal')" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700">
+            👤 Register New Tenant
+          </button>
+        </div>
+        <div id="tenantsListView" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-VIEW 4: INVOICES VIEW -->
+    <div id="view-invoices" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">📄 Monthly Invoices & Billing History (ভাড়ার রসিদ ও বিল)</h2>
+            <p class="text-xs text-slate-500">মূল ভাড়া + বিদ্যুৎ বিল + গ্যাস বিল + পানির বিলের হিসাব</p>
+          </div>
+          <button onclick="openModal('generateBillModal')" class="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-bold hover:bg-amber-600">
+            🧾 Generate Monthly Bill
+          </button>
+        </div>
+        <div id="allInvoicesList" class="mt-6">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-VIEW 5: REPORTS VIEW -->
+    <div id="view-reports" class="hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+          <div class="text-xs font-bold text-slate-400 uppercase">মোট চলতি মাসের আদায়কৃত ভাড়া</div>
+          <div class="text-2xl font-extrabold text-emerald-600 mt-2">৳ ১,১৮,০০০ BDT</div>
+          <div class="text-xs text-slate-500 mt-1">৭৩.৫% আদায় সম্পন্ন</div>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+          <div class="text-xs font-bold text-slate-400 uppercase">বকেয়া ভাড়া (Pending Collection)</div>
+          <div class="text-2xl font-extrabold text-rose-600 mt-2">৳ ৪২,৫০০ BDT</div>
+          <div class="text-xs text-slate-500 mt-1">৩ জন ভাড়াটিয়ার কাছে বকেয়া</div>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+          <div class="text-xs font-bold text-slate-400 uppercase">ইউটিলিটি বিল সংগ্রহ (Utility Sum)</div>
+          <div class="text-2xl font-extrabold text-indigo-600 mt-2">৳ ২১,২০০ BDT</div>
+          <div class="text-xs text-slate-500 mt-1">বিদ্যুৎ, গ্যাস ও পানির বিল</div>
+        </div>
+      </div>
+      
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
+        <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4">মাসিক আদায় ও বকেয়ার চার্ট ওভারভিউ</h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span>October 2026</span>
+              <span class="text-slate-600">৳ 1,18,000 / ৳ 1,60,500 (73%)</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-3">
+              <div class="bg-emerald-500 h-3 rounded-full" style="width: 73.5%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span>September 2026</span>
+              <span class="text-slate-600">৳ 1,58,000 / ৳ 1,60,000 (98%)</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-3">
+              <div class="bg-emerald-500 h-3 rounded-full" style="width: 98%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold mb-1">
+              <span>August 2026</span>
+              <span class="text-slate-600">৳ 1,60,000 / ৳ 1,60,000 (100%)</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-3">
+              <div class="bg-emerald-500 h-3 rounded-full" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-VIEW 6: SETTINGS VIEW -->
+    <div id="view-settings" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-xs max-w-2xl">
+        <h2 class="text-lg font-bold text-slate-900 mb-1">⚙️ সিস্টেম সেটিংস (System Preferences)</h2>
+        <p class="text-xs text-slate-500 mb-6">বিলিং নিয়মাবলী, স্ট্যান্ডার্ড ইউটিলিটি চার্জ এবং নোটিফিকেশন কনফিগারেশন</p>
+        
+        <div class="space-y-4 text-xs font-medium">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">বাড়ির নাম / ভবনের বিবরণ:</label>
+            <input type="text" value="হাওলাদার ভিলা (House #42, Road #09, Dhanmondi)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-slate-700 font-semibold mb-1">বিদ্যুৎ ইউনিট প্রতি রেট (BDT/Unit):</label>
+              <input type="number" value="9.50" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+            </div>
+            <div>
+              <label class="block text-slate-700 font-semibold mb-1">ফিক্সড গ্যাস বিল (দ্বিমুখী চুলা):</label>
+              <input type="number" value="1080" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+            </div>
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">ডিফল্ট পানির বিল (প্রতি ফ্ল্যাট):</label>
+            <input type="number" value="600" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">বিল প্রদানের শেষ তারিখ:</label>
+            <input type="text" value="প্রতি মাসের ১০ তারিখ" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+          <div class="pt-4">
+            <button onclick="showToast('সেটিংস সফলভাবে সংরক্ষিত হয়েছে!')" class="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">
+              Save Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- MODAL 1: ADD NEW FLAT -->
+  <div id="addFlatModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold">🏢</span>
+          <h3 class="text-base font-bold text-slate-900">Add New Flat / Room (নতুন ফ্ল্যাট যোগ করুন)</h3>
+        </div>
+        <button onclick="closeModal('addFlatModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+      </div>
+
+      <form id="addFlatForm" onsubmit="handleAddNewFlat(event)" class="mt-4 space-y-4 text-xs font-medium">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">ফ্ল্যাট / রুম নম্বর *</label>
+            <input type="text" id="newFlatNumber" required placeholder="e.g. 302, 401, R-1" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">ফ্লোর / তলা *</label>
+            <select id="newFlatFloor" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="Ground Floor">Ground Floor (নিচতলা)</option>
+              <option value="1st Floor" selected>1st Floor (২য় তলা)</option>
+              <option value="2nd Floor">2nd Floor (৩য় তলা)</option>
+              <option value="3rd Floor">3rd Floor (৪র্থ তলা)</option>
+              <option value="4th Floor">4th Floor (৫ম তলা)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">ফ্ল্যাটের ধরন (Category)</label>
+            <select id="newFlatCategory" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+              <option value="Family">Family (ফ্যামিলি)</option>
+              <option value="Bachelor">Bachelor (ব্যাচেলর মেস)</option>
+              <option value="Single Room">Single Room (এক রুম)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">রুম কনফিগারেশন</label>
+            <input type="text" id="newFlatConfig" placeholder="e.g. 2 Bed, 1 Bath, Balcony" value="2 Bed, 1 Bath" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">সাইজ (Square Feet)</label>
+            <input type="number" id="newFlatSize" placeholder="e.g. 850 sqft" value="850" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">মূল মাসিক ভাড়া (Base Rent BDT) *</label>
+            <input type="number" id="newFlatRent" required placeholder="14000" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-slate-900">
+          </div>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('addFlatModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-xs">Save Flat (যুক্ত করুন)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ASSIGN TENANT -->
+  <div id="assignTenantModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold">👤</span>
+          <h3 class="text-base font-bold text-slate-900">Assign Tenant (নতুন ভাড়াটিয়া বরাদ্দ ও চুক্তি)</h3>
+        </div>
+        <button onclick="closeModal('assignTenantModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+      </div>
+
+      <form id="assignTenantForm" onsubmit="handleAssignTenant(event)" class="mt-4 space-y-4 text-xs font-medium">
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">ফাঁকা ফ্ল্যাট নির্বাচন করুন *</label>
+          <select id="assignFlatSelect" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-slate-800">
+            <!-- Dynamically populated with vacant flats -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">ভাড়াটিয়ার পুরো নাম *</label>
+            <input type="text" id="assignTenantName" required placeholder="e.g. রফিকুল ইসলাম" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">মোবাইল নম্বর *</label>
+            <input type="tel" id="assignTenantPhone" required placeholder="01712-XXXXXX" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-mono">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">জাতীয় পরিচয়পত্র নম্বর (NID) *</label>
+            <input type="text" id="assignTenantNID" required placeholder="10 or 17 digit NID" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">পেশা (Occupation)</label>
+            <input type="text" id="assignTenantJob" placeholder="e.g. Govt Job, Banker, Student" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">অগ্রিম জামানত (Advance Deposit)</label>
+            <input type="number" id="assignAdvance" placeholder="e.g. 25000" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">ওঠার তারিখ (Move-in Date)</label>
+            <input type="date" id="assignMoveDate" value="2026-10-01" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('assignTenantModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs">Assign & Confirm (বরাদ্দ করুন)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: GENERATE MONTHLY BILL (CALCULATOR) -->
+  <div id="generateBillModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">🧾</span>
+          <h3 class="text-base font-bold text-slate-900">Generate Monthly Bill (মাসিক রসিদ ক্যালকুলেটর)</h3>
+        </div>
+        <button onclick="closeModal('generateBillModal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+      </div>
+
+      <div class="mt-4 space-y-4 text-xs font-medium">
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">ফ্ল্যাট ও ভাড়াটিয়া নির্বাচন করুন *</label>
+          <select id="billFlatSelect" onchange="onBillFlatSelected(this.value)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-slate-800">
+            <!-- Populated with occupied flats -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">মাসের নাম</label>
+            <input type="text" id="billMonth" value="October 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg font-semibold">
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">পরিশোধের শেষ তারিখ</label>
+            <input type="text" id="billDueDate" value="Oct 10, 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+          </div>
+        </div>
+
+        <!-- Utility Breakdown Calculation Block -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5">
+          <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">বিল আইটেমসমূহ (Utility Breakdown):</div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-700">১. মূল বাড়ি ভাড়া (Base Rent):</span>
+            <input type="number" id="calcBaseRent" oninput="recalcTotalBill()" class="w-28 p-1.5 text-right font-bold bg-white border border-slate-300 rounded text-slate-900">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1">
+              <span class="text-slate-700">২. বিদ্যুৎ বিল:</span>
+              <span class="text-[10px] text-slate-400">(ইউনিট হিসাব)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="number" id="calcElecUnits" oninput="recalcElecByUnits()" placeholder="Units" value="120" class="w-16 p-1.5 text-center bg-white border border-slate-300 rounded text-slate-700">
+              <span class="text-slate-400">× 9.5 =</span>
+              <input type="number" id="calcElectricity" oninput="recalcTotalBill()" class="w-24 p-1.5 text-right font-semibold bg-white border border-slate-300 rounded text-slate-900">
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-700">৩. গ্যাস বিল (Gas Bill):</span>
+            <input type="number" id="calcGas" oninput="recalcTotalBill()" value="1080" class="w-28 p-1.5 text-right font-semibold bg-white border border-slate-300 rounded text-slate-900">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-700">৪. পানির বিল (Water Bill):</span>
+            <input type="number" id="calcWater" oninput="recalcTotalBill()" value="600" class="w-28 p-1.5 text-right font-semibold bg-white border border-slate-300 rounded text-slate-900">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-700">৫. সার্ভিস চার্জ / দারোয়ান / ময়লা বিল:</span>
+            <input type="number" id="calcService" oninput="recalcTotalBill()" value="500" class="w-28 p-1.5 text-right font-semibold bg-white border border-slate-300 rounded text-slate-900">
+          </div>
+
+          <div class="pt-2 border-t border-slate-200 flex items-center justify-between text-sm">
+            <span class="font-extrabold text-slate-900">সর্বমোট প্রদেয় বিল (Total Bill):</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-lg font-black text-indigo-600" id="calcTotalBill">0</span>
+              <span class="text-xs font-bold text-slate-500">BDT</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('generateBillModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
+          <button type="button" onclick="handleGenerateBillSubmit()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold shadow-xs">Generate & Save Invoice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: PRINTABLE RENT INVOICE / RECEIPT (ভাড়ার মানি রসিদ) -->
+  <div id="receiptModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 transform transition-all max-h-[90vh] overflow-y-auto">
+      
+      <!-- Receipt printable canvas -->
+      <div id="receiptModalContent" class="space-y-4">
+        
+        <!-- Header -->
+        <div class="text-center pb-3 border-b-2 border-dashed border-slate-300">
+          <div class="inline-block px-3 py-1 bg-slate-900 text-white text-[11px] font-bold uppercase tracking-widest rounded mb-1">
+            বাড়ি ভাড়ার মানি রসিদ (Rent Invoice & Receipt)
+          </div>
+          <h2 class="text-xl font-extrabold text-slate-900">হাওলাদার ভিলা (Hawlader Villa)</h2>
+          <p class="text-xs text-slate-500">বাড়ি নং #৪২, রোড নং #০৯, ধানমন্ডি, ঢাকা-১২০৫ | মোবা: ০১৭০০-০০০০০০</p>
+        </div>
+
+        <!-- Receipt Meta Info -->
+        <div class="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-3 rounded-lg border border-slate-200">
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">রসিদ নম্বর (Invoice No):</span>
+            <span class="font-mono font-bold text-slate-800" id="recInvoiceNo">INV-2026-102</span>
+          </div>
+          <div class="text-right">
+            <span class="text-slate-400 block text-[10px] uppercase">তারিখ (Date):</span>
+            <span class="font-semibold text-slate-800" id="recDate">08 Oct 2026</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px] uppercase">ভাড়াটিয়ার নাম (Tenant):</span>
+            <span class="font-bold text-slate-900 text-sm" id="recTenantName">তানভীর আহমেদ</span>
+          </div>
+          <div class="text-right">
+            <span class="text-slate-400 block text-[10px] uppercase">ফ্ল্যাট ও তলা (Flat / Floor):</span>
+            <span class="font-bold text-indigo-700 text-sm" id="recFlatDetails">Flat 102 (1st Floor)</span>
+          </div>
+        </div>
+
+        <!-- Itemized Table -->
+        <table class="w-full text-xs text-left border border-slate-200 rounded overflow-hidden">
+          <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+            <tr>
+              <th class="p-2.5">বিবরণ (Item Description)</th>
+              <th class="p-2.5 text-right">পরিমাণ (Amount BDT)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+            <tr>
+              <td class="p-2.5">১. মাসিক মূল বাসা ভাড়া (মাস: <span id="recMonthName">October 2026</span>)</td>
+              <td class="p-2.5 text-right font-bold text-slate-900" id="recBaseRent">12,000</td>
+            </tr>
+            <tr>
+              <td class="p-2.5">২. বিদ্যুৎ বিল (ইলেকট্রিসিটি)</td>
+              <td class="p-2.5 text-right font-semibold" id="recElec">1,240</td>
+            </tr>
+            <tr>
+              <td class="p-2.5">৩. গ্যাস বিল</td>
+              <td class="p-2.5 text-right font-semibold" id="recGas">1,080</td>
+            </tr>
+            <tr>
+              <td class="p-2.5">৪. পানির বিল</td>
+              <td class="p-2.5 text-right font-semibold" id="recWater">600</td>
+            </tr>
+            <tr>
+              <td class="p-2.5">৫. সার্ভিস চার্জ ও সিকিউরিটি</td>
+              <td class="p-2.5 text-right font-semibold" id="recService">500</td>
+            </tr>
+            <tr class="bg-indigo-50/60 font-bold text-slate-900 border-t-2 border-slate-300">
+              <td class="p-2.5 text-sm">সর্বমোট প্রদেয় টাকা (Total Amount):</td>
+              <td class="p-2.5 text-right text-base text-indigo-700 font-black" id="recTotal">15,420 ৳</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Payment Status Stamp -->
+        <div class="flex items-center justify-between pt-2">
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase block">স্ট্যাটাস (Status):</span>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold" id="recStatusBadge">
+              <!-- Paid / Due badge -->
+            </span>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 uppercase block">কথায় (In Words):</span>
+            <span class="text-xs italic text-slate-600" id="recInWords">পনেরো হাজার চারশত বিশ টাকা মাত্র</span>
+          </div>
+        </div>
+
+        <!-- Signature Boxes -->
+        <div class="pt-8 grid grid-cols-2 gap-8 text-center text-[11px] text-slate-500">
+          <div>
+            <div class="border-t border-slate-400 pt-1 font-semibold text-slate-700">ভাড়াটিয়ার স্বাক্ষর (Tenant Signature)</div>
+          </div>
+          <div>
+            <div class="border-t border-slate-400 pt-1 font-semibold text-slate-700">বাড়িওয়ালার স্বাক্ষর (Owner Signature)</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action buttons -->
+      <div class="no-print mt-6 pt-4 border-t border-slate-200 flex items-center justify-end gap-2">
+        <button onclick="closeModal('receiptModal')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
+          বন্ধ করুন (Close)
+        </button>
+        <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs">
+          <span>🖨️</span>
+          <span>রসিদ প্রিন্ট করুন (Print Receipt)</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 border border-slate-700 text-xs font-medium">
+      <span id="toastIcon" class="text-base">✅</span>
+      <span id="toastMessage">অ্যাকশন সফল হয়েছে</span>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 mt-auto py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-700">SmartRent Manager</span>
+        <span>• House Rent & Tenant Management System</span>
+      </div>
+      <div class="text-slate-400">
+        Designed for Landlords & Caretakers • Bangladeshi Real-estate UX Standard
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== JAVASCRIPT STATE & LOGIC ==================== -->
+  <script>
+    // Initial Reactive State
+    const appData = {
+      flats: [
+        {
+          id: "101",
+          number: "101",
+          floor: "1st Floor",
+          size: 780,
+          category: "Family",
+          config: "2 Bed, 1 Bath, Balcony",
+          rent: 12000,
+          status: "vacant", // vacant | paid | due
+          tenant: null,
+          bills: { electricity: 0, gas: 0, water: 0, service: 0 },
+          month: "October 2026"
+        },
+        {
+          id: "102",
+          number: "102",
+          floor: "1st Floor",
+          size: 850,
+          category: "Family",
+          config: "2 Bed, 2 Bath, Kitchen",
+          rent: 12000,
+          status: "paid",
+          tenant: {
+            name: "Tanvir Ahmed (তানভীর আহমেদ)",
+            phone: "01712-345678",
+            nid: "1988269250001423",
+            job: "Software Engineer",
+            advance: 24000,
+            moveIn: "Jan 2025"
+          },
+          bills: { electricity: 1240, gas: 1080, water: 600, service: 500 },
+          month: "October 2026"
+        },
+        {
+          id: "201",
+          number: "201",
+          floor: "2nd Floor",
+          size: 1050,
+          category: "Family",
+          config: "3 Bed, 2 Bath, 2 Balcony",
+          rent: 14000,
+          status: "due",
+          tenant: {
+            name: "Sakib Hasan (সাকিব হাসান)",
+            phone: "01819-987654",
+            nid: "1991269380009988",
+            job: "Bank Officer",
+            advance: 28000,
+            moveIn: "Mar 2024"
+          },
+          bills: { electricity: 1620, gas: 1080, water: 600, service: 500 },
+          month: "October 2026",
+          dueDate: "Oct 10, 2026"
+        },
+        {
+          id: "202",
+          number: "202",
+          floor: "2nd Floor",
+          size: 1100,
+          category: "Family",
+          config: "3 Bed, 2 Bath",
+          rent: 13500,
+          status: "due",
+          tenant: {
+            name: "Mahmudul Hasan (মাহমুদুল হাসান)",
+            phone: "01911-223344",
+            nid: "1985269123456789",
+            job: "College Lecturer",
+            advance: 27000,
+            moveIn: "May 2024"
+          },
+          bills: { electricity: 1720, gas: 1080, water: 600, service: 500 },
+          month: "October 2026",
+          dueDate: "Oct 10, 2026"
+        },
+        {
+          id: "301",
+          number: "301",
+          floor: "3rd Floor",
+          size: 920,
+          category: "Bachelor",
+          config: "3 Bed, Mess Sharing",
+          rent: 12500,
+          status: "due",
+          tenant: {
+            name: "Farhan Kabir (ফারহান কবির - মেস)",
+            phone: "01678-554433",
+            nid: "1997269876543210",
+            job: "University Student (4 members)",
+            advance: 25000,
+            moveIn: "Aug 2025"
+          },
+          bills: { electricity: 1620, gas: 1080, water: 600, service: 500 },
+          month: "October 2026",
+          dueDate: "Oct 10, 2026"
+        },
+        {
+          id: "302",
+          number: "302",
+          floor: "3rd Floor",
+          size: 950,
+          category: "Family",
+          config: "2 Bed, 2 Bath",
+          rent: 13000,
+          status: "paid",
+          tenant: {
+            name: "Kamal Uddin (কামাল উদ্দিন)",
+            phone: "01733-112233",
+            nid: "1983269456789012",
+            job: "Businessman",
+            advance: 26000,
+            moveIn: "Jan 2023"
+          },
+          bills: { electricity: 1150, gas: 1080, water: 600, service: 500 },
+          month: "October 2026"
+        },
+        {
+          id: "401",
+          number: "401",
+          floor: "4th Floor",
+          size: 1150,
+          category: "Family",
+          config: "3 Bed, 3 Bath",
+          rent: 15000,
+          status: "paid",
+          tenant: {
+            name: "Dr. Anisur Rahman (ডা: আনিসুর রহমান)",
+            phone: "01844-332211",
+            nid: "1979269567890123",
+            job: "Medical Officer",
+            advance: 30000,
+            moveIn: "Nov 2022"
+          },
+          bills: { electricity: 1890, gas: 1080, water: 600, service: 500 },
+          month: "October 2026"
+        },
+        {
+          id: "402",
+          number: "402",
+          floor: "4th Floor",
+          size: 1150,
+          category: "Family",
+          config: "3 Bed, 3 Bath",
+          rent: 15000,
+          status: "paid",
+          tenant: {
+            name: "Zillur Rahman (জিল্লুর রহমান)",
+            phone: "01552-998877",
+            nid: "1982269678901234",
+            job: "Govt Employee",
+            advance: 30000,
+            moveIn: "Feb 2024"
+          },
+          bills: { electricity: 1420, gas: 1080, water: 600, service: 500 },
+          month: "October 2026"
+        },
+        {
+          id: "501",
+          number: "501",
+          floor: "5th Floor",
+          size: 750,
+          category: "Bachelor",
+          config: "2 Bed, Mess",
+          rent: 11000,
+          status: "paid",
+          tenant: {
+            name: "Nahid Hasan (নাহিদ হাসান)",
+            phone: "01799-445566",
+            nid: "1998269789012345",
+            job: "Junior Developer",
+            advance: 22000,
+            moveIn: "Jul 2025"
+          },
+          bills: { electricity: 950, gas: 1080, water: 600, service: 500 },
+          month: "October 2026"
+        },
+        {
+          id: "502",
+          number: "502",
+          floor: "5th Floor",
+          size: 750,
+          category: "Single Room",
+          config: "1 Bed Studio",
+          rent: 8500,
+          status: "paid",
+          tenant: {
+            name: "Tamim Iqbal (তামিম ইকবাল)",
+            phone: "01622-778899",
+            nid: "1999269890123456",
+            job: "Accountant",
+            advance: 17000,
+            moveIn: "Sep 2025"
+          },
+          bills: { electricity: 720, gas: 1080, water: 600, service: 500 },
+          month: "October 2026"
+        },
+        {
+          id: "601",
+          number: "601",
+          floor: "Rooftop (ছাদ)",
+          size: 600,
+          category: "Bachelor",
+          config: "1 Bed Studio, Roof Garden",
+          rent: 9000,
+          status: "vacant",
+          tenant: null,
+          bills: { electricity: 0, gas: 0, water: 0, service: 0 },
+          month: "October 2026"
+        },
+        {
+          id: "602",
+          number: "602",
+          floor: "Rooftop (ছাদ)",
+          size: 600,
+          category: "Single Room",
+          config: "1 Bed, Terrace",
+          rent: 9000,
+          status: "vacant",
+          tenant: null,
+          bills: { electricity: 0, gas: 0, water: 0, service: 0 },
+          month: "October 2026"
+        }
+      ],
+      currentFilter: 'all',
+      searchQuery: ''
+    };
+
+    // Calculate total bill for a flat
+    function calculateTotalBillForFlat(flat) {
+      if (!flat || flat.status === 'vacant') return 0;
+      const b = flat.bills;
+      return (flat.rent || 0) + (b.electricity || 0) + (b.gas || 0) + (b.water || 0) + (b.service || 0);
+    }
+
+    // Refresh UI & Stats
+    function updateStatsAndBadges() {
+      const total = appData.flats.length;
+      const occupied = appData.flats.filter(f => f.status !== 'vacant').length;
+      const vacant = appData.flats.filter(f => f.status === 'vacant').length;
+      const dueFlats = appData.flats.filter(f => f.status === 'due');
+      
+      const totalDueAmount = dueFlats.reduce((sum, f) => sum + calculateTotalBillForFlat(f), 0);
+
+      document.getElementById('statTotalFlats').textContent = total;
+      document.getElementById('statOccupiedFlats').textContent = occupied;
+      document.getElementById('statVacantFlats').textContent = vacant;
+      document.getElementById('statTotalDue').textContent = totalDueAmount.toLocaleString();
+      document.getElementById('statUnpaidCount').textContent = `${dueFlats.length} Invoices unpaid (জরুরি তাগাদা প্রয়োজন)`;
+      document.getElementById('statActiveLeases').textContent = `${occupied} Active leases (সক্রিয় ভাড়াটিয়া)`;
+      
+      // Badges
+      document.getElementById('navFlatCount').textContent = total;
+      document.getElementById('navTenantCount').textContent = occupied;
+      document.getElementById('navDueCount').textContent = `${dueFlats.length} Due`;
+      document.getElementById('unpaidCountBadge').textContent = `${dueFlats.length} Invoices`;
+
+      // Filter Counts
+      document.getElementById('filter-occupied').textContent = `Occupied (${occupied})`;
+      document.getElementById('filter-vacant').textContent = `Vacant (${vacant})`;
+      document.getElementById('filter-due').textContent = `⚠️ Due (${dueFlats.length})`;
+    }
+
+    // Render Grid Cards
+    function renderFlatsGrid() {
+      const container = document.getElementById('flatsGridContainer');
+      container.innerHTML = '';
+
+      let filtered = appData.flats.filter(flat => {
+        if (appData.currentFilter === 'occupied') return flat.status !== 'vacant';
+        if (appData.currentFilter === 'vacant') return flat.status === 'vacant';
+        if (appData.currentFilter === 'due') return flat.status === 'due';
+        return true;
+      });
+
+      if (appData.searchQuery.trim() !== '') {
+        const q = appData.searchQuery.toLowerCase();
+        filtered = filtered.filter(f => {
+          return f.number.toLowerCase().includes(q) ||
+                 f.floor.toLowerCase().includes(q) ||
+                 (f.tenant && f.tenant.name.toLowerCase().includes(q)) ||
+                 (f.tenant && f.tenant.phone.includes(q));
+        });
+      }
+
+      document.getElementById('gridCountDisplay').textContent = `${filtered.length} টি ফ্ল্যাট দেখানো হচ্ছে`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center bg-white rounded-xl border border-dashed border-slate-300">
+            <span class="text-4xl block mb-2">🔍</span>
+            <p class="text-slate-600 font-semibold text-sm">কোনো ফ্ল্যাট পাওয়া যায়নি</p>
+            <p class="text-slate-400 text-xs mt-1">অন্য কোনো নাম বা নম্বর দিয়ে খুঁজুন</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(flat => {
+        const card = document.createElement('div');
+        const isVacant = flat.status === 'vacant';
+        const isDue = flat.status === 'due';
+        const isPaid = flat.status === 'paid';
+
+        let borderClass = 'border-slate-200';
+        let statusBadge = '';
+        let buttonAction = '';
+
+        if (isVacant) {
+          borderClass = 'border-amber-200 bg-amber-50/20';
+          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-amber-100 text-amber-800 border border-amber-300/60">VACANT (ফাঁকা)</span>`;
+          buttonAction = `
+            <button onclick="prepareAssignModal('${flat.id}')" class="w-full mt-3 py-2 px-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+              <span>👤</span>
+              <span>Assign Tenant (বরাদ্দ)</span>
+            </button>
+          `;
+        } else if (isDue) {
+          borderClass = 'border-rose-300 bg-rose-50/20';
+          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-rose-600 badge-pulse"></span> DUE ⚠️</span>`;
+          buttonAction = `
+            <div class="grid grid-cols-2 gap-1.5 mt-3">
+              <button onclick="markAsPaid('${flat.id}')" class="py-2 px-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-lg transition-colors flex items-center justify-center gap-1">
+                <span>✔</span>
+                <span>Mark Paid</span>
+              </button>
+              <button onclick="sendTenantReminder('${flat.id}')" class="py-2 px-2 bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-[11px] rounded-lg transition-colors flex items-center justify-center gap-1">
+                <span>🔔</span>
+                <span>Reminder</span>
+              </button>
+            </div>
+          `;
+        } else {
+          borderClass = 'border-emerald-200 bg-emerald-50/10';
+          statusBadge = `<span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">PAID ✔</span>`;
+          buttonAction = `
+            <div class="grid grid-cols-2 gap-1.5 mt-3">
+              <button onclick="openReceiptForFlat('${flat.id}')" class="py-2 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] rounded-lg transition-colors flex items-center justify-center gap-1">
+                <span>🧾</span>
+                <span>রসিদ দেখুন</span>
+              </button>
+              <button onclick="viewTenantProfile('${flat.id}')" class="py-2 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[11px] rounded-lg transition-colors flex items-center justify-center gap-1">
+                <span>👤</span>
+                <span>প্রোফাইল</span>
+              </button>
+            </div>
+          `;
+        }
+
+        const totalWithBill = calculateTotalBillForFlat(flat);
+
+        card.className = `bg-white rounded-xl p-4 border ${borderClass} shadow-xs hover:shadow-md transition-all flex flex-col justify-between`;
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-extrabold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-md font-mono">Flat: ${flat.number}</span>
+                <span class="text-[11px] text-slate-500 font-medium">${flat.floor}</span>
+              </div>
+              ${statusBadge}
+            </div>
+
+            <div class="mt-3 space-y-1.5 text-xs">
+              ${isVacant ? `
+                <div class="py-2 text-slate-500 italic flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <span>বর্তমানে কোনো ভাড়াটিয়া নেই</span>
+                </div>
+              ` : `
+                <div class="flex items-baseline justify-between">
+                  <span class="text-slate-400 text-[11px]">ভাড়াটিয়া:</span>
+                  <span class="font-bold text-slate-900 truncate max-w-[150px]" title="${flat.tenant.name}">${flat.tenant.name.split('(')[0]}</span>
+                </div>
+              `}
+
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400 text-[11px]">মূল ভাড়া:</span>
+                <span class="font-extrabold text-slate-900">${flat.rent.toLocaleString()} BDT</span>
+              </div>
+
+              ${!isVacant ? `
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="text-slate-400">মোট বিলসহ:</span>
+                  <span class="font-bold ${isDue ? 'text-rose-600' : 'text-emerald-600'}">৳ ${totalWithBill.toLocaleString()} BDT</span>
+                </div>
+              ` : ''}
+
+              <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+                <span>${flat.config}</span>
+                <span class="font-semibold text-slate-600">${flat.size} sqft</span>
+              </div>
+
+              <div class="flex items-center gap-1.5 text-[10px] text-slate-400">
+                <span class="px-1.5 py-0.2 bg-slate-100 rounded text-slate-600 font-medium">${flat.category}</span>
+                <span>• ${flat.month}</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            ${buttonAction}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Render Unpaid Invoices Table
+    function renderUnpaidInvoicesTable() {
+      const tbody = document.getElementById('unpaidInvoicesTableBody');
+      tbody.innerHTML = '';
+
+      const dueFlats = appData.flats.filter(f => f.status === 'due');
+
+      if (dueFlats.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-8 text-center text-emerald-600 font-semibold bg-emerald-50/30">
+              🎉 চমৎকার! চলতি মাসের সকল ভাড়া ও বিল সফলভাবে পরিশোধিত হয়েছে। কোনো বকেয়া নেই।
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      dueFlats.forEach(flat => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/80 transition-colors';
+
+        const total = calculateTotalBillForFlat(flat);
+        const b = flat.bills;
+
+        tr.innerHTML = `
+          <td class="py-3 px-4">
+            <span class="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">Flat ${flat.number}</span>
+            <span class="block text-[10px] text-slate-400 mt-0.5">${flat.floor}</span>
+          </td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-slate-900">${flat.tenant.name}</div>
+            <div class="font-mono text-[11px] text-slate-500 flex items-center gap-1">
+              <span>📞</span> ${flat.tenant.phone}
+            </div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="font-semibold text-slate-700">${flat.month}</span>
+          </td>
+          <td class="py-3 px-4 text-[11px] text-slate-600">
+            <div>ভাড়া: ৳${flat.rent.toLocaleString()} | বিদ্যুৎ: ৳${b.electricity}</div>
+            <div class="text-slate-400">গ্যাস: ৳${b.gas} | পানি: ৳${b.water} | সার্ভিস: ৳${b.service}</div>
+          </td>
+          <td class="py-3 px-4 text-right">
+            <span class="text-sm font-extrabold text-rose-600">৳ ${total.toLocaleString()}</span>
+            <span class="block text-[10px] font-bold text-rose-400 uppercase">BDT DUE</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="font-semibold text-slate-800">${flat.dueDate || 'Oct 10, 2026'}</span>
+            <span class="block text-[10px] text-rose-500 font-bold">Overdue / Urgent</span>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <button onclick="markAsPaid('${flat.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-bold text-[11px] shadow-2xs transition-colors">
+                Mark as Paid
+              </button>
+              <button onclick="sendTenantReminder('${flat.id}')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs transition-colors" title="Send SMS Reminder">
+                🔔
+              </button>
+              <button onclick="openReceiptForFlat('${flat.id}')" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-md text-xs transition-colors" title="View Invoice">
+                📄
+              </button>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Mark an invoice as Paid
+    function markAsPaid(flatId) {
+      const flat = appData.flats.find(f => f.id === flatId);
+      if (flat) {
+        flat.status = 'paid';
+        updateStatsAndBadges();
+        renderFlatsGrid();
+        renderUnpaidInvoicesTable();
+        showToast(`ফ্ল্যাট ${flat.number}-এর ভাড়া পরিশোধিত হিসেবে মার্ক করা হয়েছে! ✔`);
+      }
+    }
+
+    // Send Tenant Reminder
+    function sendTenantReminder(flatId) {
+      const flat = appData.flats.find(f => f.id === flatId);
+      if (flat && flat.tenant) {
+        showToast(`📲 SMS & WhatsApp তাগাদা পাঠানো হয়েছে: ${flat.tenant.phone} (${flat.tenant.name.split('(')[0]})`);
+      }
+    }
+
+    function sendBulkReminders() {
+      showToast(`📲 সকল বকেয়া ভাড়াটিয়ার (৩ জন) মোবাইলে এসএমএস পাঠানো সম্পন্ন হয়েছে!`);
+    }
+
+    // Modal Control
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+      if (modalId === 'assignTenantModal') {
+        populateVacantFlatsSelect();
+      } else if (modalId === 'generateBillModal') {
+        populateOccupiedFlatsSelect();
+      }
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Populate Selects
+    function populateVacantFlatsSelect() {
+      const select = document.getElementById('assignFlatSelect');
+      select.innerHTML = '';
+      const vacants = appData.flats.filter(f => f.status === 'vacant');
+
+      if (vacants.length === 0) {
+        select.innerHTML = '<option disabled>কোনো ফাঁকা ফ্ল্যাট নেই</option>';
+        return;
+      }
+
+      vacants.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = `Flat ${f.number} - ${f.floor} (ভাড়া: ${f.rent.toLocaleString()} BDT, ${f.config})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function populateOccupiedFlatsSelect() {
+      const select = document.getElementById('billFlatSelect');
+      select.innerHTML = '';
+      const occupied = appData.flats.filter(f => f.status !== 'vacant');
+
+      occupied.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = `Flat ${f.number} - ${f.tenant ? f.tenant.name : 'Unknown'} (${f.floor})`;
+        select.appendChild(opt);
+      });
+
+      if (occupied.length > 0) {
+        onBillFlatSelected(occupied[0].id);
+      }
+    }
+
+    function onBillFlatSelected(flatId) {
+      const flat = appData.flats.find(f => f.id === flatId);
+      if (flat) {
+        document.getElementById('calcBaseRent').value = flat.rent;
+        document.getElementById('calcElecUnits').value = 135;
+        document.getElementById('calcElectricity').value = Math.round(135 * 9.5);
+        document.getElementById('calcGas').value = flat.bills.gas || 1080;
+        document.getElementById('calcWater').value = flat.bills.water || 600;
+        document.getElementById('calcService').value = flat.bills.service || 500;
+        recalcTotalBill();
+      }
+    }
+
+    function recalcElecByUnits() {
+      const units = parseFloat(document.getElementById('calcElecUnits').value) || 0;
+      const rate = 9.5; // BDT per unit
+      document.getElementById('calcElectricity').value = Math.round(units * rate);
+      recalcTotalBill();
+    }
+
+    function recalcTotalBill() {
+      const base = parseFloat(document.getElementById('calcBaseRent').value) || 0;
+      const elec = parseFloat(document.getElementById('calcElectricity').value) || 0;
+      const gas = parseFloat(document.getElementById('calcGas').value) || 0;
+      const water = parseFloat(document.getElementById('calcWater').value) || 0;
+      const service = parseFloat(document.getElementById('calcService').value) || 0;
+      const total = base + elec + gas + water + service;
+
+      document.getElementById('calcTotalBill').textContent = total.toLocaleString();
+    }
+
+    function handleGenerateBillSubmit() {
+      const flatId = document.getElementById('billFlatSelect').value;
+      const flat = appData.flats.find(f => f.id === flatId);
+      if (flat) {
+        flat.rent = parseFloat(document.getElementById('calcBaseRent').value) || flat.rent;
+        flat.bills.electricity = parseFloat(document.getElementById('calcElectricity').value) || 0;
+        flat.bills.gas = parseFloat(document.getElementById('calcGas').value) || 0;
+        flat.bills.water = parseFloat(document.getElementById('calcWater').value) || 0;
+        flat.bills.service = parseFloat(document.getElementById('calcService').value) || 0;
+        flat.month = document.getElementById('billMonth').value;
+        flat.dueDate = document.getElementById('billDueDate').value;
+        flat.status = 'due';
+
+        closeModal('generateBillModal');
+        updateStatsAndBadges();
+        renderFlatsGrid();
+        renderUnpaidInvoicesTable();
+        showToast(`ফ্ল্যাট ${flat.number}-এর জন্য মাসিক রসিদ ও বিল তৈরি সম্পন্ন হয়েছে!`);
+      }
+    }
+
+    // Handle Add New Flat
+    function handleAddNewFlat(event) {
+      event.preventDefault();
+      const num = document.getElementById('newFlatNumber').value.trim();
+      const floor = document.getElementById('newFlatFloor').value;
+      const cat = document.getElementById('newFlatCategory').value;
+      const cfg = document.getElementById('newFlatConfig').value;
+      const size = parseInt(document.getElementById('newFlatSize').value) || 800;
+      const rent = parseInt(document.getElementById('newFlatRent').value) || 12000;
+
+      const newFlat = {
+        id: num,
+        number: num,
+        floor: floor,
+        size: size,
+        category: cat,
+        config: cfg,
+        rent: rent,
+        status: "vacant",
+        tenant: null,
+        bills: { electricity: 0, gas: 0, water: 0, service: 0 },
+        month: "October 2026"
+      };
+
+      appData.flats.push(newFlat);
+      closeModal('addFlatModal');
+      document.getElementById('addFlatForm').reset();
+      updateStatsAndBadges();
+      renderFlatsGrid();
+      showToast(`নতুন ফ্ল্যাট #${num} তালিকায় যুক্ত হয়েছে!`);
+    }
+
+    // Handle Assign Tenant
+    function prepareAssignModal(flatId) {
+      openModal('assignTenantModal');
+      const select = document.getElementById('assignFlatSelect');
+      select.value = flatId;
+    }
+
+    function handleAssignTenant(event) {
+      event.preventDefault();
+      const flatId = document.getElementById('assignFlatSelect').value;
+      const name = document.getElementById('assignTenantName').value.trim();
+      const phone = document.getElementById('assignTenantPhone').value.trim();
+      const nid = document.getElementById('assignTenantNID').value.trim();
+      const job = document.getElementById('assignTenantJob').value.trim() || 'Service Holder';
+      const advance = parseInt(document.getElementById('assignAdvance').value) || 20000;
+      const moveDate = document.getElementById('assignMoveDate').value;
+
+      const flat = appData.flats.find(f => f.id === flatId);
+      if (flat) {
+        flat.status = 'paid';
+        flat.tenant = {
+          name: name,
+          phone: phone,
+          nid: nid,
+          job: job,
+          advance: advance,
+          moveIn: moveDate
+        };
+        flat.bills = { electricity: 1100, gas: 1080, water: 600, service: 500 };
+
+        closeModal('assignTenantModal');
+        document.getElementById('assignTenantForm').reset();
+        updateStatsAndBadges();
+        renderFlatsGrid();
+        renderUnpaidInvoicesTable();
+        showToast(`ফ্ল্যাট ${flat.number}-এ ভাড়াটিয়া ${name} সফলভাবে বরাদ্দ হয়েছেন!`);
+      }
+    }
+
+    // Receipt View
+    function openReceiptForFlat(flatId) {
+      const flat = appData.flats.find(f => f.id === flatId);
+      if (!flat || !flat.tenant) return;
+
+      const total = calculateTotalBillForFlat(flat);
+      const b = flat.bills;
+
+      document.getElementById('recInvoiceNo').textContent = `INV-2026-${flat.number}`;
+      document.getElementById('recDate').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      document.getElementById('recTenantName').textContent = flat.tenant.name;
+      document.getElementById('recFlatDetails').textContent = `Flat ${flat.number} (${flat.floor})`;
+      document.getElementById('recMonthName').textContent = flat.month || 'October 2026';
+      
+      document.getElementById('recBaseRent').textContent = flat.rent.toLocaleString() + ' ৳';
+      document.getElementById('recElec').textContent = b.electricity.toLocaleString() + ' ৳';
+      document.getElementById('recGas').textContent = b.gas.toLocaleString() + ' ৳';
+      document.getElementById('recWater').textContent = b.water.toLocaleString() + ' ৳';
+      document.getElementById('recService').textContent = b.service.toLocaleString() + ' ৳';
+      document.getElementById('recTotal').textContent = total.toLocaleString() + ' ৳';
+
+      const badge = document.getElementById('recStatusBadge');
+      if (flat.status === 'paid') {
+        badge.className = 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+        badge.innerHTML = '✔ PAID (পরিশোধিত)';
+      } else {
+        badge.className = 'inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300';
+        badge.innerHTML = '⚠️ UNPAID / DUE (বকেয়া)';
+      }
+
+      openModal('receiptModal');
+    }
+
+    function viewTenantProfile(flatId) {
+      const flat = appData.flats.find(f => f.id === flatId);
+      if (flat && flat.tenant) {
+        alert(
+          `Tenant Profile:\n\n` +
+          `Name: ${flat.tenant.name}\n` +
+          `Mobile: ${flat.tenant.phone}\n` +
+          `NID No: ${flat.tenant.nid}\n` +
+          `Occupation: ${flat.tenant.job}\n` +
+          `Flat: ${flat.number} (${flat.floor})\n` +
+          `Advance Deposit: ৳${flat.tenant.advance ? flat.tenant.advance.toLocaleString() : 'N/A'}\n` +
+          `Joined: ${flat.tenant.moveIn}`
+        );
+      }
+    }
+
+    // Filter Handlers
+    function filterFlats(type) {
+      appData.currentFilter = type;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-white', 'text-slate-800', 'shadow-xs');
+        btn.classList.add('text-slate-600');
+      });
+      const activeBtn = document.getElementById(`filter-${type}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'bg-white', 'text-slate-800', 'shadow-xs');
+        activeBtn.classList.remove('text-slate-600');
+      }
+      renderFlatsGrid();
+    }
+
+    function handleGlobalSearch(query) {
+      appData.searchQuery = query;
+      renderFlatsGrid();
+    }
+
+    // Switch Tabs
+    function switchTab(tabId) {
+      const views = ['dashboard', 'flats', 'tenants', 'invoices', 'reports', 'settings'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.nav-tab').forEach(b => {
+        b.classList.remove('bg-indigo-600', 'text-white');
+        b.classList.add('text-slate-300');
+      });
+
+      const currentView = document.getElementById(`view-${tabId}`);
+      if (currentView) currentView.classList.remove('hidden');
+
+      const currentBtn = document.getElementById(`nav-${tabId}`);
+      if (currentBtn) {
+        currentBtn.classList.add('bg-indigo-600', 'text-white');
+        currentBtn.classList.remove('text-slate-300');
+      }
+
+      // Populate other tabs if clicked
+      if (tabId === 'flats') renderFlatsListView();
+      if (tabId === 'tenants') renderTenantsListView();
+      if (tabId === 'invoices') renderAllInvoicesList();
+    }
+
+    function renderFlatsListView() {
+      const container = document.getElementById('flatsListView');
+      container.innerHTML = '';
+      appData.flats.forEach(f => {
+        const row = document.createElement('div');
+        row.className = 'p-3.5 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs';
+        row.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-slate-800 bg-white border border-slate-200 px-2.5 py-1 rounded font-mono">#${f.number}</span>
+            <div>
+              <span class="font-bold text-slate-900">${f.floor}</span> • <span class="text-slate-500">${f.config} (${f.size} sqft)</span>
+              <div class="text-[11px] text-slate-400">ধরণ: ${f.category}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="font-bold text-slate-900">৳ ${f.rent.toLocaleString()} BDT</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${f.status === 'vacant' ? 'bg-amber-100 text-amber-800' : (f.status === 'due' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800')}">${f.status.toUpperCase()}</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderTenantsListView() {
+      const container = document.getElementById('tenantsListView');
+      container.innerHTML = '';
+      const occupied = appData.flats.filter(f => f.status !== 'vacant');
+      occupied.forEach(f => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-xl border border-slate-200 shadow-xs text-xs space-y-2';
+        card.innerHTML = `
+          <div class="flex items-center justify-between border-b pb-2">
+            <span class="font-bold text-slate-900">${f.tenant.name}</span>
+            <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-mono text-[11px] font-bold">Flat ${f.number}</span>
+          </div>
+          <div class="text-slate-600 space-y-1">
+            <div>📞 <strong>Phone:</strong> ${f.tenant.phone}</div>
+            <div>🪪 <strong>NID:</strong> ${f.tenant.nid}</div>
+            <div>💼 <strong>Job:</strong> ${f.tenant.job}</div>
+            <div>💰 <strong>Advance:</strong> ৳${f.tenant.advance ? f.tenant.advance.toLocaleString() : 'N/A'}</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderAllInvoicesList() {
+      const container = document.getElementById('allInvoicesList');
+      container.innerHTML = '';
+      appData.flats.filter(f => f.status !== 'vacant').forEach(f => {
+        const item = document.createElement('div');
+        item.className = 'p-3 mb-2 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between text-xs';
+        const tot = calculateTotalBillForFlat(f);
+        item.innerHTML = `
+          <div>
+            <span class="font-bold text-slate-900">Flat ${f.number} - ${f.tenant.name}</span>
+            <div class="text-[11px] text-slate-500">মাসের নাম: ${f.month} • মোট বিল: ৳${tot.toLocaleString()} BDT</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${f.status === 'due' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'}">${f.status.toUpperCase()}</span>
+            <button onclick="openReceiptForFlat('${f.id}')" class="px-3 py-1 bg-white border border-slate-300 rounded font-bold hover:bg-slate-100">View Receipt</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // Toast Notifications
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+
+    // Initial Boot
+    window.addEventListener('DOMContentLoaded', () => {
+      updateStatsAndBadges();
+      renderFlatsGrid();
+      renderUnpaidInvoicesTable();
+    });
+  </script>
+</body>
+</html>
